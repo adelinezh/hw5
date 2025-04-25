@@ -42,7 +42,7 @@ void combinations(int index, std::string current, std::string remainingFloating,
   
   if (current[index] != '-')
   {
-    return combinations(index + 1, current, remainingFloating, dict, results);
+    combinations(index + 1, current, remainingFloating, dict, results);
   }
   else
   {
@@ -60,7 +60,7 @@ void combinations(int index, std::string current, std::string remainingFloating,
       {
         if (current.size() - index - 1 >= remainingFloating.size())
         {
-          return combinations(index + 1, current, remainingFloating, dict, results);
+          combinations(index + 1, current, remainingFloating, dict, results);
         }
       }
     }
