@@ -13,7 +13,7 @@ using namespace std;
 
 
 // Add prototypes of helper functions here
-
+void combinations(int index, std::string current, std::string remainingFloating, const std::set<std::string>& dict, std::set<std::string>& results);
 
 // Definition of primary wordle function
 std::set<std::string> wordle(
@@ -24,25 +24,16 @@ std::set<std::string> wordle(
     // Add your code here
     std::string current = in;
     std::set<std::string> results;
-    if (current.size() == n) //if input is already a word
-    {
-      if (dict.found(current))
-      {
-        results.push_back(current);
-      }
-    }
-
-
-    //if word is found in dict, add to list of all possible words
+    combinations(0, current, floating, dict, results);
     return results;
 
 }
 
-void combinations(int index, std::string current, std::string remainingFloating, const std::set<std::string>& dict, std::set<std::string> results)
+void combinations(int index, std::string current, std::string remainingFloating, const std::set<std::string>& dict, std::set<std::string>& results)
 {
-  if (index == current.size() && remainingFloating.empty())
+  if (index == current.size())
   {
-    if (dict.counter(current))
+    if (remainingFloating.empty() && dict.find(current) != dict.end())
     {
       results.insert(current);
     }
@@ -51,28 +42,27 @@ void combinations(int index, std::string current, std::string remainingFloating,
   
   if (current[index] != '-')
   {
-    combinations(index + 1, current; remainingFloating, dict, results);
+    return combinations(index + 1, current, remainingFloating, dict, results);
   }
   else
   {
-    for (char c = 'a'; c < 'z'; c++)
+    for (char c = 'a'; c <= 'z'; c++)
     {
       current[index] = c;
       
-      if (remainingFloating.find(c))
+      if (remainingFloating.find(c) != std::string::npos)
       {
         std::string newFloating = remainingFloating;
-        newFloating.erase(remainingFloating.find(c), 1);
-        combinations(index + 1, current; remainingFloating, dict, results);
+        newFloating.erase(newFloating.find(c), 1);
+        combinations(index + 1, current, newFloating, dict, results);
       }
       else
       {
         if (current.size() - index - 1 >= remainingFloating.size())
         {
-          combinations(index + 1, current; remainingFloating, dict, results);
+          return combinations(index + 1, current, remainingFloating, dict, results);
         }
       }
     }
   }
 }
-// Define any helper functions here
