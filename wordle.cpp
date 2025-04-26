@@ -13,7 +13,7 @@ using namespace std;
 
 
 // Add prototypes of helper functions here
-void combinations(int index, std::string current, std::string remainingFloating, const std::set<std::string>& dict, std::set<std::string>& results);
+set<string> combinations(int index, std::string current, std::string floating);
 
 // Definition of primary wordle function
 std::set<std::string> wordle(
@@ -22,47 +22,70 @@ std::set<std::string> wordle(
     const std::set<std::string>& dict)
 {
     // Add your code here
-    std::string current = in;
+    std::set<std::string> words = combinations(0, in, floating);
     std::set<std::string> results;
-    combinations(0, current, floating, dict, results);
+    
+    for(set<string>::iterator it = words.begin(); it != words.end(); it++)
+    {
+      if (dict.find(*it) != dict.end())
+      {
+        results.insert(*it);
+      }
+    }
     return results;
-
 }
 
-void combinations(int index, std::string current, std::string remainingFloating, const std::set<std::string>& dict, std::set<std::string>& results)
+set<string> combinations(int index, std::string current, std::string floating)
 {
-  if (index == current.size())
+  set<string> combos;
+  if (current.length() == 0)
   {
-    if (remainingFloating.empty() && dict.find(current) != dict.end())
-    {
-      results.insert(current);
-    }
-    return;
+    return combos;
   }
   
-  if (current[index] != '-')
+  int blankCount = 0;
+  for (int i = 0; i < current.length(); i ++)
   {
-    combinations(index + 1, current, remainingFloating, dict, results);
-  }
-  else
-  {
-    for (char c = 'a'; c <= 'z'; c++)
+    if (current[i] == '-')
     {
-      current[index] = c;
-      
-      if (remainingFloating.find(c) != std::string::npos)
+      blankCount ++;
+    }
+  }
+
+  if (blankCount == 0) //completed word
+  {
+    combos.insert(current);
+    return combos;
+  }
+
+  if (current[index] == '-') //blanks
+  {
+    //check floating characters
+    for(unsigned int i = 0; i < floating.length(); i++)
+    {
+      char character = floating[i];
+      current[index] = character;
+      string newFloating = floating.substr(0, i) + floating.substr(i + 1);
+      set<string> temp = combinations(index + 1, current, newFloating);
+      combos.insert(temp.begin(), temp.end());
+      current[index] = '-';
+    }
+
+    if ((int)floating.length() < blankCount) //no letters left in floating
+    {
+      for (char c = 'a'; c <= 'z'; c++)
       {
-        std::string newFloating = remainingFloating;
-        newFloating.erase(newFloating.find(c), 1);
-        combinations(index + 1, current, newFloating, dict, results);
-      }
-      else
-      {
-        if (current.size() - index - 1 >= remainingFloating.size())
-        {
-          combinations(index + 1, current, remainingFloating, dict, results);
-        }
+        current[index] = c;
+        set<string> temp = combinations(index + 1, current, floating);
+        combos.insert(temp.begin(), temp.end());
+        current[index] = '-';
       }
     }
   }
+  else //no blanks
+  {
+    set<string> temp = combinations(index + 1, current, floating);
+    combos.insert(temp.begin(), temp.end());
+  }
+  return combos;
 }
